@@ -1,0 +1,44 @@
+html {
+    font-size: 62.5%;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+}
+
+* {
+    box-sizing: inherit;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-size: 1.6rem;
+}
+
+.app {
+    background: url(../assets/background.png) center/cover;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 43rem;
+    margin-inline: auto;
+    padding-inline: 1.2rem;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    user-select: none;
+    border: none;
+}
+
+button:disabled {
+    cursor: not-allowed;
+}
+
+.loading {
+    text-align: center;
+    font-size: 2.4rem;
+    color: #2f527b;
+    font-weight: 500;
+}

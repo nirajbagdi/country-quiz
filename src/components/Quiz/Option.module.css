@@ -1,0 +1,72 @@
+.option {
+    position: relative;
+
+    width: 100%;
+    margin-bottom: 2rem;
+    box-shadow: inset 0 0 0 2px rgb(96 102 208 / 70%);
+    /* padding: 1.2rem 6.4rem; */
+    padding: 1.2rem 1.8rem 1.2rem 5.2rem;
+    border-radius: 12px;
+
+    background: #fff;
+    color: rgba(96, 102, 208, 0.8);
+    font-size: 1.6rem;
+    text-align: left;
+    transition: all 0.3s ease-in-out;
+}
+
+.option.wrong {
+    background-color: #ea8282;
+    color: #fff;
+    box-shadow: none;
+}
+
+.option.correct {
+    background-color: #60bf88;
+    color: #fff;
+    box-shadow: none;
+}
+
+.option::before,
+.option::after {
+    position: absolute;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.option::before {
+    top: 50%;
+    left: 2.4rem;
+}
+
+.option::after {
+    top: 58%;
+    right: 2.4rem;
+}
+
+.option.wrong::after {
+    content: url('../../assets/close_outline.svg');
+}
+
+.option.correct::after {
+    content: url('../../assets/check_outline.svg');
+}
+
+.option:first-child::before {
+    content: 'A';
+}
+.option:nth-child(2)::before {
+    content: 'B';
+}
+.option:nth-child(3)::before {
+    content: 'C';
+}
+.option:last-child::before {
+    content: 'D';
+}
+
+.option:not(.correct):not(.wrong):not(:disabled):hover {
+    background-color: #f9a826;
+    color: #fff;
+    box-shadow: none;
+}

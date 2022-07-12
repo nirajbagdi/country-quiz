@@ -1,0 +1,44 @@
+.quiz {
+    position: relative;
+}
+
+.quiz img {
+    width: 8rem;
+    border-radius: 12px;
+    margin-bottom: 1.6rem;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
+}
+
+.quiz::before {
+    position: absolute;
+    top: -8rem;
+    right: 0;
+    content: url(../../assets/undraw_adventure_4hum\ 1.svg);
+}
+
+@media (max-width: 600px) {
+    .quiz::before {
+        display: none;
+    }
+}
+
+.title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2f527b;
+    margin-bottom: 2.4rem;
+}
+
+.actions {
+    text-align: right;
+}
+
+.actions button {
+    font-size: 1.6rem;
+    font-weight: 500;
+    border-radius: 12px;
+    color: #fff;
+    background-color: #f9a826;
+    box-shadow: 0 2px 4px rgba(252, 168, 47, 0.4);
+    padding: 1.2rem 3rem;
+}

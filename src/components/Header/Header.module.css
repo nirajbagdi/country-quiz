@@ -1,0 +1,9 @@
+.header {
+    padding: 8rem 0 1.2rem;
+}
+
+.header h1 {
+    font-size: 3rem;
+    color: #f2f2f2;
+    text-transform: uppercase;
+}
