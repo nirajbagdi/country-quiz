@@ -1,37 +1,56 @@
 import axios from 'axios';
 
-import { Country, Question, FetchedData } from '../models';
-import { API_URL, TOTAL_QUESTIONS } from '../constants';
-import { shuffleArray } from '../utils';
+import { shuffleArray } from 'utils';
+import { API_URL, QUESTIONS_PER_SET } from 'constants/index';
+import { Country, FetchedCountry, Question, QuestionType, FetchQuestionsError } from 'models';
 
-export const fetchQuestions = async (): Promise<Question[]> => {
-    const { data: fetchedData } = await axios.get(API_URL);
+const getOptions = (countries: Country[], country: Country) => {
+	const randomOptions = [...countries]
+		.splice(Math.floor(Math.random() * countries.length - 3), 3)
+		.map(c => c.name);
 
-    const modifiedData = fetchedData.map((country: FetchedData) => ({
-        name: country.name.common,
-        capital: country.capital?.[0],
-        flag: country.flags.svg
-    }));
+	return shuffleArray([...randomOptions, country.name]);
+};
 
-    const shuffledQuestions: Country[] = shuffleArray(modifiedData);
+const getTitle = (type: QuestionType, country: Country) => {
+	switch (type) {
+		case QuestionType.CAPITAL:
+			return `${country.capital} is the capital of`;
+		case QuestionType.FLAG:
+			return 'What country does this flag belong to?';
+		default:
+			return '';
+	}
+};
 
-    return shuffledQuestions.slice(0, TOTAL_QUESTIONS).map(country => {
-        let options = [...shuffledQuestions]
-            .splice(Math.floor(Math.random() * shuffledQuestions.length), 3)
-            .map(country => country.name);
+const createQuestion = (type: QuestionType, country: Country, countries: Country[]): Question => {
+	const options = getOptions(countries, country);
+	const title = getTitle(type, country);
+	const correctAnswer = country.name;
 
-        const countryData: Country = {
-            name: country.name,
-            capital: country.capital,
-            flag: country.flag
-        };
+	return { type, title, correctAnswer, options, country };
+};
 
-        options = shuffleArray([...options, countryData.name]);
+export const fetchQuestions = async (questionType = QuestionType.CAPITAL): Promise<Question[]> => {
+	try {
+		const { data: fetchedCountries } = await axios.get(API_URL);
 
-        return {
-            country: countryData,
-            correctAnswer: countryData.name,
-            options
-        };
-    });
+		const countriesData: Country[] = fetchedCountries.map((country: FetchedCountry) => ({
+			flags: {
+				svg: country.flags.svg,
+				alt: country.flags.alt,
+			},
+			name: country.name.common,
+			capital: country.capital?.[0] || '',
+		}));
+
+		const shuffledCountriesData = shuffleArray(countriesData);
+
+		return shuffledCountriesData
+			.slice(0, QUESTIONS_PER_SET)
+			.map(country => createQuestion(questionType, country, shuffledCountriesData));
+	} catch (error) {
+		console.error('Error fetching questions: ', error);
+		throw new FetchQuestionsError('Failed to fetch questions. Please try again later.');
+	}
 };
