@@ -1,0 +1,41 @@
+.results {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.results .title {
+	color: hsla(218, 52%, 24%, 1);
+	font-weight: 700;
+	font-size: 3.6rem;
+	margin-top: 4.4rem;
+}
+
+.results .desc {
+	font-size: 1.6rem;
+	color: hsla(218, 52%, 24%, 1);
+	font-weight: 400;
+	margin-bottom: 3.2rem;
+}
+
+.results .desc span {
+	font-weight: 700;
+	color: hsla(145, 50%, 62%, 1);
+	font-size: 2.4rem;
+	margin-inline: 0.2rem;
+}
+
+.results button {
+	outline: none;
+	border: none;
+	cursor: pointer;
+
+	font: inherit;
+	color: hsla(218, 52%, 24%, 1);
+	font-weight: 600;
+	box-shadow: 0 0 0 2px hsla(218, 52%, 24%, 1);
+	background-color: #fff;
+
+	padding: 1.2rem 3.2rem;
+	border-radius: 12px;
+}

@@ -1,92 +1,104 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
-import { fetchQuestions } from './api';
-import { Question, QuestionTypes, UserAnswer } from './models';
-import { TOTAL_QUESTIONS } from './constants';
-
-import { Card, Layout, QuizCard, ResultsCard } from './components';
+import { Card, Layout, Quiz, Results, Option } from 'components';
+import { fetchQuestions } from 'api';
+import { Question, UserAnswer, FetchQuestionsError, QuestionType } from 'models';
+import { QUESTIONS_PER_SET } from 'constants/index';
 
 const App = () => {
-    const [questions, setQuestions] = useState<Question[]>([]);
-    const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
-    const [questionType, setQuestionType] = useState(QuestionTypes.CAPITAL);
-    const [loading, setLoading] = useState(false);
-    const [number, setNumber] = useState(0);
-    const [score, setScore] = useState(0);
+	const [questions, setQuestions] = useState<Question[]>([]);
+	const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
+	const [questionType, setQuestionType] = useState<QuestionType | null>(null);
+	const [fetchError, setFetchError] = useState<FetchQuestionsError | null>(null);
+	const [isLoading, setIsLoading] = useState(false);
+	const [questionIdx, setQuestionIdx] = useState(0);
+	const [score, setScore] = useState(0);
 
-    const currentQuestion = questions[number];
+	const currentQuestion = questions[questionIdx];
+	const hasAnswered = questionIdx === userAnswers.length - 1;
+	const hasReachedEnd = questionIdx === QUESTIONS_PER_SET;
 
-    const hasAnswered = userAnswers.length === number + 1;
-    const hasReachedEnd =
-        userAnswers.length === TOTAL_QUESTIONS && number !== TOTAL_QUESTIONS - 1;
+	useEffect(() => {
+		if (questionType !== null) loadQuestions(questionType);
+	}, [questionType]);
 
-    useEffect(() => {
-        (async () => await loadQuestions())();
-    }, []);
+	const loadQuestions = async (type: QuestionType) => {
+		setIsLoading(true);
 
-    const loadQuestions = async () => {
-        setLoading(true);
+		try {
+			const questions = await fetchQuestions(type);
+			setQuestions(questions);
+		} catch (error) {
+			setFetchError(error as FetchQuestionsError);
+		}
 
-        const fetchedQuestions = await fetchQuestions();
-        setQuestions(fetchedQuestions);
+		setIsLoading(false);
+		setUserAnswers([]);
+		setQuestionIdx(0);
+		setScore(0);
+	};
 
-        setLoading(false);
-        setUserAnswers([]);
-        setScore(0);
-        setNumber(0);
-        setQuestionType(QuestionTypes.CAPITAL);
-    };
+	const handleAnswer = (userAnswer: string) => {
+		const { correctAnswer } = currentQuestion;
+		const isCorrect = userAnswer === correctAnswer;
 
-    const handleAnswer = (event: React.MouseEvent) => {
-        const selectedAnswer = event.currentTarget.textContent || '';
-        const regex = new RegExp(selectedAnswer, 'gi');
+		const userAnswerObj: UserAnswer = { userAnswer, correctAnswer, isCorrect };
+		setUserAnswers(prevAnswers => [...prevAnswers, userAnswerObj]);
 
-        const userAnswer = {
-            isCorrect: !!currentQuestion.correctAnswer.match(regex),
-            correctAnswer: currentQuestion.correctAnswer,
-            selectedAnswer
-        };
+		if (isCorrect) setScore(score => score + 1);
+	};
 
-        if (userAnswer.isCorrect) setScore(score => score + 1);
-        setUserAnswers(prevAnswers => [...prevAnswers, userAnswer]);
-    };
+	const handleNextQuestion = () => {
+		setQuestionIdx(idx => idx + 1);
+	};
 
-    const handleNextQuestion = () => {
-        setNumber(num => num + 1);
+	const quizContentJSX = (
+		<Quiz
+			question={currentQuestion}
+			onAnswer={handleAnswer}
+			hasAnswered={hasAnswered}
+			userAnswer={userAnswers[questionIdx]}
+			onNextQuestion={handleNextQuestion}
+		/>
+	);
 
-        setQuestionType(type =>
-            type === QuestionTypes.CAPITAL ? QuestionTypes.FLAG : QuestionTypes.CAPITAL
-        );
-    };
+	const resultsContentJSX = (
+		<Results
+			score={score}
+			onLoadQuestions={() => loadQuestions(questionType || QuestionType.CAPITAL)}
+		/>
+	);
 
-    const loadingContent = (
-        <Card>
-            <p className="loading">Loading...</p>
-        </Card>
-    );
+	const errorContentJSX = (
+		<Card>
+			<p className="text-center">{fetchError?.message}</p>
+		</Card>
+	);
 
-    const quizCardContent = (
-        <QuizCard
-            question={currentQuestion}
-            questionType={questionType}
-            hasAnswered={hasAnswered}
-            userAnswer={userAnswers[number]}
-            onAnswer={handleAnswer}
-            onNextQuestion={handleNextQuestion}
-        />
-    );
+	const loadingContentJSX = (
+		<Card>
+			<p className="text-center">Loading...</p>
+		</Card>
+	);
 
-    const resultCardContent = (
-        <ResultsCard score={score} onLoadQuestions={loadQuestions} />
-    );
+	return (
+		<Layout>
+			{!questionType && (
+				<Card>
+					<Option
+						name="Capital Quiz"
+						onClick={() => setQuestionType(QuestionType.CAPITAL)}
+					/>
+					<Option name="Flag Quiz" onClick={() => setQuestionType(QuestionType.FLAG)} />
+				</Card>
+			)}
 
-    return (
-        <Layout>
-            {loading && !currentQuestion && loadingContent}
-            {!loading && currentQuestion && !hasReachedEnd && quizCardContent}
-            {!loading && hasReachedEnd && resultCardContent}
-        </Layout>
-    );
+			{isLoading && !currentQuestion && loadingContentJSX}
+			{!isLoading && !currentQuestion && fetchError && errorContentJSX}
+			{!isLoading && currentQuestion && !hasReachedEnd && quizContentJSX}
+			{!isLoading && hasReachedEnd && resultsContentJSX}
+		</Layout>
+	);
 };
 
 export default App;

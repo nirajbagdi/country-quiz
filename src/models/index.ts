@@ -1,35 +1,48 @@
-export type Country = {
-    name: string;
-    capital: string;
-    flag: string;
+export type FetchedCountry = {
+	flags: {
+		png: string;
+		svg: string;
+		alt: string;
+	};
+	name: {
+		common: string;
+		official: string;
+		nativeName: {};
+	};
+	capital: string[];
 };
 
+export class FetchQuestionsError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = 'FetchQuestionsError';
+	}
+}
+
+export type Country = {
+	flags: {
+		svg: string;
+		alt: string;
+	};
+	name: string;
+	capital: string;
+};
+
+export enum QuestionType {
+	CAPITAL = 'CAPITAL',
+	FLAG = 'FLAG',
+}
+
 export type Question = {
-    country: Country;
-    correctAnswer: string;
-    options: string[];
+	type: QuestionType;
+	title: string;
+	correctAnswer: string;
+	options: string[];
+	country: Country;
 };
 
 export type UserAnswer = {
-    selectedAnswer: string;
-    correctAnswer: string;
-    isCorrect: boolean;
-};
-
-export enum QuestionTypes {
-    CAPITAL = 'capital',
-    FLAG = 'flag'
-}
-
-export type FetchedData = {
-    name: {
-        common: string;
-        official: string;
-        nativeName: {};
-    };
-    flags: {
-        png: string;
-        svg: string;
-    };
-    capital: string[];
+	userAnswer: string;
+	correctAnswer: string;
+	isCorrect: boolean;
 };

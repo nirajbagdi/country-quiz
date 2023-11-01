@@ -1,12 +1,16 @@
-import Header from '../Header/Header';
+import Header from 'components/Header/Header';
 
-const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <div className="app">
-        <div className="container">
-            <Header />
-            {children}
-        </div>
-    </div>
+type Props = {
+	children: React.ReactNode;
+};
+
+const Layout: React.FC<Props> = ({ children }) => (
+	<div className="app">
+		<div className="container">
+			<Header />
+			{children}
+		</div>
+	</div>
 );
 
 export default Layout;
