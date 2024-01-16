@@ -28,7 +28,7 @@ body::-webkit-scrollbar {
 
 .app {
 	min-height: 100vh;
-	background: url('../assets/background.png') no-repeat center/cover;
+	background: url('../assets/background.webp') no-repeat center/cover;
 }
 
 .container {
